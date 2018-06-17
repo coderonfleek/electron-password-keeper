@@ -11,6 +11,9 @@
 
 <body>
     <h2>Welcome Home</h2>
+    <img style="max-width: 80px" id="picture" />
+    <h3 id="name"></h3>
+    <div id="data"></div>
 </body>
 
 <script>
@@ -28,6 +31,9 @@
   auth0Client.parseHash({state: '123', nonce: '456'}, (err, authResult) => {
     if (err) return console.error(err);
     console.log(authResult);
+    document.getElementById('picture').src = authResult.idTokenPayload.picture;
+    document.getElementById('name').innerText = authResult.idTokenPayload.name;
+    document.getElementById('data').innerText = authResult.accessToken;
   });
 </script>
 

@@ -8,14 +8,21 @@ const filter = {
   urls: ['https://*.auth0.com/*']
 };
 
+// we need this otherwise localstorage, sessionstorage, cookies, etc, are disabled
+// https://electronjs.org/docs/api/protocol#methods
+protocol.registerStandardSchemes(['atom']);
+
 function showWindow() {
 
   protocol.registerFileProtocol('atom', (request, callback) => {
-    const url = request.url.substr(7);
-    if (url.indexOf('/home.html') === 0) {
-      return callback(`/Users/brunokrebs/git/auth0/guest-authors/electron-password-keeper/home.html`)
+    const url = request.url.substring(7, request.url.length - 1);
+
+    if (url.indexOf('home.html') === 0) {
+      // needed, otherwise it will try to load a non-existing file ending with '#access_token=eyJ0...'
+      return callback(`${__dirname}/home.html`);
     }
-    callback(`/Users/brunokrebs/git/auth0/guest-authors/electron-password-keeper/${url}`)
+
+    callback(`${__dirname}/${url}`);
   }, (error) => {
     if (error) console.error('Failed to register protocol')
   });
@@ -48,7 +55,7 @@ function showWindow() {
   });
 
   // and load the index.html of the app.
-  win.loadURL(`atom:///index.html`);
+  win.loadURL(`atom://index.html`);
 
   // Open the DevTools.
   win.webContents.openDevTools();
