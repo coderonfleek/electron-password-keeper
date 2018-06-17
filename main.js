@@ -1,17 +1,54 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, session, protocol } = require('electron');
+const path = require('path');
+const crypto = require('crypto');
 
 let win;
 
+const filter = {
+  urls: ['https://*.auth0.com/*']
+};
+
 function showWindow() {
+
+  protocol.registerFileProtocol('atom', (request, callback) => {
+    const url = request.url.substr(7);
+    if (url.indexOf('/home.html') === 0) {
+      return callback(`/Users/brunokrebs/git/auth0/guest-authors/electron-password-keeper/home.html`)
+    }
+    callback(`/Users/brunokrebs/git/auth0/guest-authors/electron-password-keeper/${url}`)
+  }, (error) => {
+    if (error) console.error('Failed to register protocol')
+  });
+
+  session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+    details.requestHeaders['origin'] = 'http://localhost:3000';
+    callback({cancel: false, requestHeaders: details.requestHeaders})
+  });
+
+  function base64URLEncode(str) {
+    return str.toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  }
+  const verifier = base64URLEncode(crypto.randomBytes(32));
+
+  function sha256(buffer) {
+    return crypto.createHash('sha256').update(buffer).digest();
+  }
+  const challenge = base64URLEncode(sha256(verifier));
+
   // Create the browser window.
   win = new BrowserWindow({
     width: 1000,
     height: 600,
-    webPreferences: { webSecurity: false }
+    webPreferences: {
+      nodeIntegration: false,
+    }
   });
 
   // and load the index.html of the app.
-  win.loadFile('index.html');
+  win.loadURL(`atom:///index.html`);
 
   // Open the DevTools.
   win.webContents.openDevTools();

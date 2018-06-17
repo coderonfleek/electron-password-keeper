@@ -6,10 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Home Page</title>
+    <script src="https://cdn.auth0.com/js/auth0/9.6.1/auth0.min.js"></script>
 </head>
 
 <body>
     <h2>Welcome Home</h2>
 </body>
+
+<script>
+  console.log(window.location);
+
+  auth0Client = new auth0.WebAuth({
+    domain: 'bk-tmp.auth0.com',
+    audience: 'https://ionic-audio-player.com/',
+    scope: 'openid profile',
+    responseType: 'token id_token',
+    clientID: '4Hf5632gZacg0vGmLq1zzzWCjH9J8tUA',
+    redirectUri: 'atom:///home.html'
+  });
+
+  auth0Client.parseHash({state: '123', nonce: '456'}, (err, authResult) => {
+    if (err) return console.error(err);
+    console.log(authResult);
+  });
+</script>
 
 </html>

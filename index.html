@@ -2,75 +2,33 @@
 <html>
 
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Log In to WebVR Demo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.auth0.com/js/auth0/9.3.1/auth0.min.js"></script>
-    <script src="https://cdn.auth0.com/js/lock/11.5.2/lock.min.js"></script>
-    <script src="jquery.min.js"></script>
-
-    <!-- <script>
-        $.getScript('https://cdn.auth0.com/js/auth0/9.3.1/auth0.min.js');
-        $.getScript('https://cdn.auth0.com/js/lock/11.5.2/lock.min.js');
-    </script> -->
-
-
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Log In to WebVR Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.auth0.com/js/auth0/9.6.1/auth0.min.js"></script>
 </head>
 
 <body>
-
-    <script>
-
-        /* var lock = new Auth0LockPasswordless('nQ7YbPzFmBs3gcaZfjFbrz7vxTPDi2mm', 'fikitout.auth0.com', {
-            allowedConnections: ['email'],           // Should match the Email connection name, it defaults to 'email'     
-            passwordlessMethod: 'code',              // If not specified, defaults to 'code'
-            auth: {
-                redirect: false
-            }
-        }); */
-        var lock = new Auth0LockPasswordless(
-            "Ml52S0dL3GHJUuL4Q8Vl7aeL540pELiM",
-            "fikitout.auth0.com",
-            {
-                allowedConnections: ["email"],
-                passwordlessMethod: 'code',
-                rememberLastLogin: false,
-                socialButtonStyle: "big",
-                languageDictionary: { "title": "Password Keeper" },
-                language: "en",
-                theme: {},
-                closable: false,
-                auth: {
-                    redirect: false
-                }
-            }
-        );
-
-        lock.on("authenticated", function (authResult) {
-            lock.getUserInfo(authResult.accessToken, function (error, profile) {
-                if (error) {
-                    console.log(error);
-                    return;
-                }
-
-                //localStorage.setItem("accessToken", authResult.accessToken);
-                //localStorage.setItem("profile", JSON.stringify(profile));
-
-                //Go to VR Page
-                window.location.replace('stage.html');
-            });
-        });
+<h1>Welcome</h1>
+<p>
+  <button onclick="auth0Client.authorize()">Click here to sign in.</button>
+</p>
 
 
-        lock.on('authorization_error', function (error) {
-            console.log('authorization_error', error);
-        });
+<script>
+  auth0Client = new auth0.WebAuth({
+    domain: 'bk-tmp.auth0.com',
+    audience: 'https://ionic-audio-player.com/',
+    scope: 'openid profile',
+    responseType: 'token id_token',
+    clientID: '4Hf5632gZacg0vGmLq1zzzWCjH9J8tUA',
+    redirectUri: 'atom:///home.html',
+    state: '123',
+    nonce: '456',
+  });
 
-        lock.show();
-
-
-    </script>
+  localStorage.setItem('myCat', 'Tom');
+</script>
 </body>
-
 </html>
