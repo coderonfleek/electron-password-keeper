@@ -1,21 +1,15 @@
-const { app, BrowserWindow, session, protocol } = require('electron');
-const path = require('path');
-const crypto = require('crypto');
+const {app, BrowserWindow, protocol} = require('electron');
 
 let win;
 
-const filter = {
-  urls: ['https://*.auth0.com/*']
-};
-
-// we need this otherwise localstorage, sessionstorage, cookies, etc, are disabled
+// needed, otherwise localstorage, sessionstorage, cookies, etc, become unavailable
 // https://electronjs.org/docs/api/protocol#methods
 protocol.registerStandardSchemes(['atom']);
 
 function showWindow() {
 
   protocol.registerFileProtocol('atom', (request, callback) => {
-    const url = request.url.substring(7, request.url.length - 1);
+    const url = request.url.replace('atom://my-app/', '').substring(0, request.url.length - 1);
 
     if (url.indexOf('home.html') === 0) {
       // needed, otherwise it will try to load a non-existing file ending with '#access_token=eyJ0...'
@@ -27,24 +21,6 @@ function showWindow() {
     if (error) console.error('Failed to register protocol')
   });
 
-  session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
-    details.requestHeaders['origin'] = 'http://localhost:3000';
-    callback({cancel: false, requestHeaders: details.requestHeaders})
-  });
-
-  function base64URLEncode(str) {
-    return str.toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-  }
-  const verifier = base64URLEncode(crypto.randomBytes(32));
-
-  function sha256(buffer) {
-    return crypto.createHash('sha256').update(buffer).digest();
-  }
-  const challenge = base64URLEncode(sha256(verifier));
-
   // Create the browser window.
   win = new BrowserWindow({
     width: 1000,
@@ -55,7 +31,7 @@ function showWindow() {
   });
 
   // and load the index.html of the app.
-  win.loadURL(`atom://index.html`);
+  win.loadURL(`atom:///my-app/index.html`);
 
   // Open the DevTools.
   win.webContents.openDevTools();
@@ -90,6 +66,3 @@ app.on('activate', () => {
     showWindow();
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

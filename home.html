@@ -17,18 +17,16 @@
 </body>
 
 <script>
-  console.log(window.location);
-
   auth0Client = new auth0.WebAuth({
     domain: 'bk-tmp.auth0.com',
     audience: 'https://ionic-audio-player.com/',
     scope: 'openid profile',
     responseType: 'token id_token',
     clientID: '4Hf5632gZacg0vGmLq1zzzWCjH9J8tUA',
-    redirectUri: 'atom:///home.html'
+    redirectUri: 'atom:///my-app/home.html'
   });
 
-  auth0Client.parseHash({state: '123', nonce: '456'}, (err, authResult) => {
+  auth0Client.parseHash((err, authResult) => {
     if (err) return console.error(err);
     console.log(authResult);
     document.getElementById('picture').src = authResult.idTokenPayload.picture;
