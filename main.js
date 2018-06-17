@@ -2,14 +2,17 @@ const {app, BrowserWindow, protocol} = require('electron');
 
 let win;
 
+const customScheme = 'custom-scheme';
+const customDomain = 'custom-domain';
+
 // needed, otherwise localstorage, sessionstorage, cookies, etc, become unavailable
 // https://electronjs.org/docs/api/protocol#methods
-protocol.registerStandardSchemes(['atom']);
+protocol.registerStandardSchemes([customScheme]);
 
 function showWindow() {
 
-  protocol.registerFileProtocol('atom', (request, callback) => {
-    const url = request.url.replace('atom://my-app/', '').substring(0, request.url.length - 1);
+  protocol.registerFileProtocol(customScheme, (request, callback) => {
+    const url = request.url.replace(`${customScheme}://${customDomain}/`, '').substring(0, request.url.length - 1);
 
     if (url.indexOf('home.html') === 0) {
       // needed, otherwise it will try to load a non-existing file ending with '#access_token=eyJ0...'
@@ -31,7 +34,7 @@ function showWindow() {
   });
 
   // and load the index.html of the app.
-  win.loadURL(`atom:///my-app/index.html`);
+  win.loadURL(`${customScheme}://${customDomain}/index.html`);
 
   // Open the DevTools.
   win.webContents.openDevTools();
