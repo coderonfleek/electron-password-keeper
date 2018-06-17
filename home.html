@@ -22,11 +22,7 @@
 
   auth0Client = new auth0.WebAuth({
     domain: 'bk-tmp.auth0.com',
-    audience: 'https://ionic-audio-player.com/',
-    scope: 'openid profile',
-    responseType: 'token id_token',
     clientID: '4Hf5632gZacg0vGmLq1zzzWCjH9J8tUA',
-    redirectUri: `${customScheme}://${customDomain}/home.html`
   });
 
   auth0Client.parseHash((err, authResult) => {
