@@ -6,32 +6,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Home Page</title>
-    <script src="https://cdn.auth0.com/js/auth0/9.6.1/auth0.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://rawgit.com/auth0/jwt-decode/master/build/jwt-decode.min.js"></script>
 </head>
 
 <body>
     <h2>Welcome Home</h2>
     <img style="max-width: 80px" id="picture" />
     <h3 id="name"></h3>
-    <div id="data"></div>
+    <div id="success"></div>
 </body>
 
 <script>
+  const auth0Domain = 'bk-tmp.auth0.com';
+  const clientId = 'SZn5thLoabZeWatzCJZ5i1kpcnwx4IVm';
+  const clientSecret = 'A-7Fg2lLFiJALIkpaKZ2MoYw_WEUUtq3_MnNWACr0PRXe8DyyF9ylkDxQm92mnkE';
   const customScheme = 'custom-scheme';
   const customDomain = 'custom-domain';
+  const grantType = 'authorization_code';
+  const redirectUri = `${customScheme}://${customDomain}/home.html`;
 
-  auth0Client = new auth0.WebAuth({
-    domain: 'bk-tmp.auth0.com',
-    clientID: '4Hf5632gZacg0vGmLq1zzzWCjH9J8tUA',
+  // parsing the hash to get access to `code`
+  const hash = window.location.hash.substring(1);
+  const hashParams = {};
+  hash.split('&').map(hashParam => {
+    const keyValue = hashParam.split('=');
+    hashParams[keyValue[0]] = keyValue[1];
   });
 
-  auth0Client.parseHash((err, authResult) => {
-    if (err) return console.error(err);
-    console.log(authResult);
-    document.getElementById('picture').src = authResult.idTokenPayload.picture;
-    document.getElementById('name').innerText = authResult.idTokenPayload.name;
-    document.getElementById('data').innerText = authResult.accessToken;
-  });
+  const profile = jwt_decode(hashParams.id_token);
+
+  document.getElementById('picture').src = profile.picture;
+  document.getElementById('name').innerText = profile.name;
+
+  axios.post('https://' + auth0Domain + '/oauth/token', {
+    grant_type: grantType,
+    client_id: clientId,
+    client_secret: clientSecret,
+    code: hashParams.code,
+    redirect_uri: redirectUri,
+  }).then((response) => {
+    const { access_token, refresh_token } = response.data;
+    document.getElementById('success').innerText = 'Both `access_token` and `refresh_token` were loaded successfully.';
+    sessionStorage.setItem('access_token', access_token);
+    localStorage.setItem('refresh_token', refresh_token);
+  }).catch(console.log);
 </script>
 
 </html>
