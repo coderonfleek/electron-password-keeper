@@ -2,6 +2,9 @@ const {app, BrowserWindow, protocol} = require('electron');
 
 let win;
 
+// you will need a custom scheme so Auth0 can redirect to this scheme+domain after authentication
+// i.e. `file://home.html` won't work because Auth0 appends a hash to the callback URL and Electron
+// will think it has to load a file called (e.g.) `home.html#access_token=123...`
 const customScheme = 'custom-scheme';
 const customDomain = 'custom-domain';
 
