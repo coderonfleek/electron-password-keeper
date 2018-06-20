@@ -1,4 +1,5 @@
 const {app, BrowserWindow, ipcMain, protocol} = require('electron');
+const envVariables = require('./env-variables');
 
 let win;
 
@@ -34,10 +35,12 @@ function showWindow() {
   });
 
   ipcMain.on('loaded', () => {
+    const {audience, auth0Domain, clientId, clientSecret} = envVariables;
     win.webContents.send('globalProps', {
-      auth0Domain: 'bk-tmp.auth0.com',
-      clientId: 'SZn5thLoabZeWatzCJZ5i1kpcnwx4IVm',
-      clientSecret: 'A-7Fg2lLFiJALIkpaKZ2MoYw_WEUUtq3_MnNWACr0PRXe8DyyF9ylkDxQm92mnkE',
+      audience,
+      auth0Domain,
+      clientId,
+      clientSecret,
       customScheme,
       customDomain,
     });

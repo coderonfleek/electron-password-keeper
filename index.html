@@ -11,41 +11,44 @@
 <body>
 <h1>Welcome</h1>
 <p>
-  <button onclick="signIn()">Click here to sign in.</button>
+  <button id="login">Click here to sign in.</button>
 </p>
 
 <script>
-  // TODO generate better (random?) nonce and state properties
+  const { ipcRenderer } = require('electron');
 
-  const audience = 'https://electron-app-api.com/';
-  const auth0Domain = 'bk-tmp.auth0.com';
-  const clientId = 'SZn5thLoabZeWatzCJZ5i1kpcnwx4IVm';
-  const clientSecret = 'A-7Fg2lLFiJALIkpaKZ2MoYw_WEUUtq3_MnNWACr0PRXe8DyyF9ylkDxQm92mnkE';
-  const customScheme = 'custom-scheme';
-  const customDomain = 'custom-domain';
-  const nonce = 'XHcLb-0hZg~V5u~lz-KKpr8rfqlQh9JZ';
-  const redirectUri = `${customScheme}://${customDomain}/home.html`;
-  const responseType = 'code id_token';
-  const scope = 'openid profile offline_access read:passwords';
-  const state = 'czc13QkjPlb9V-xCmMpqDlURjSyse02L';
+  ipcRenderer.send('loaded');
 
-  // checking for refresh token to redirect authenticated users
-  const refresh_token = localStorage.getItem('refresh_token');
-  if (refresh_token) window.location.assign(encodeURI(redirectUri));
+  ipcRenderer.on('globalProps', (event, props) => {
+    const {audience, auth0Domain, clientId, clientSecret, customScheme, customDomain} = props;
+    // TODO generate better (random?) nonce and state properties
 
-  const authorisationUrl = 'https://' + auth0Domain + '/authorize' +
-    '?client_id=' + clientId +
-    '&client_secret=' + clientSecret +
-    '&response_type=' + responseType +
-    '&redirect_uri=' + redirectUri +
-    '&scope=' + scope +
-    '&audience=' + audience +
-    '&state=' + state +
-    '&nonce=' + nonce;
+    const nonce = 'XHcLb-0hZg~V5u~lz-KKpr8rfqlQh9JZ';
+    const redirectUri = `${customScheme}://${customDomain}/home.html`;
+    const responseType = 'code id_token';
+    const scope = 'openid profile offline_access read:passwords';
+    const state = 'czc13QkjPlb9V-xCmMpqDlURjSyse02L';
 
-  function signIn() {
-    window.location.assign(encodeURI(authorisationUrl));
-  }
+    // checking for refresh token to redirect authenticated users
+    const refresh_token = localStorage.getItem('refresh_token');
+    if (refresh_token) window.location.assign(encodeURI(redirectUri));
+
+    const authorisationUrl = 'https://' + auth0Domain + '/authorize' +
+      '?client_id=' + clientId +
+      '&client_secret=' + clientSecret +
+      '&response_type=' + responseType +
+      '&redirect_uri=' + redirectUri +
+      '&scope=' + scope +
+      '&audience=' + audience +
+      '&state=' + state +
+      '&nonce=' + nonce;
+
+    function login() {
+      window.location.assign(encodeURI(authorisationUrl));
+    }
+
+    document.getElementById('login').onclick = login;
+  });
 </script>
 </body>
 </html>
