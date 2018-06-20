@@ -15,7 +15,7 @@ function showWindow() {
     const url = request.url.replace(`${customScheme}://${customDomain}/`, '').substring(0, request.url.length - 1);
 
     if (url.indexOf('home.html') === 0) {
-      // needed, otherwise it will try to load a non-existing file ending with '#access_token=eyJ0...'
+      // needed, cause Auth0 includes '#access_token=eyJ0...' on the callback URL
       return callback(`${__dirname}/home.html`);
     }
 
