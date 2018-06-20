@@ -15,79 +15,82 @@
   <img style="max-width: 80px" id="picture" />
   <h3 id="name"></h3>
   <div id="success"></div>
-  <button onclick="logout()">Logout</button>
+  <button id="logout">Logout</button>
 </body>
 
 <script>
-  const auth0Domain = 'bk-tmp.auth0.com';
-  const clientId = 'SZn5thLoabZeWatzCJZ5i1kpcnwx4IVm';
-  const clientSecret = 'A-7Fg2lLFiJALIkpaKZ2MoYw_WEUUtq3_MnNWACr0PRXe8DyyF9ylkDxQm92mnkE';
-  const customScheme = 'custom-scheme';
-  const customDomain = 'custom-domain';
-  const authorizationCodeType = 'authorization_code';
-  const refreshTokenType = 'refresh_token';
-  const redirectUri = `${customScheme}://${customDomain}/home.html`;
-  const tokenUrl = `https://${auth0Domain}/oauth/token`;
+  const { ipcRenderer } = require('electron');
 
-  const authConfig = {
-    client_id: clientId,
-    client_secret: clientSecret,
-    redirect_uri: redirectUri,
-  };
+  ipcRenderer.send('loaded');
 
-  const refresh_token = localStorage.getItem('refresh_token');
-  if (refresh_token) authWithRefreshToken();
-  else authWithAuthorizationToken();
+  ipcRenderer.on('globalProps', (event, props) => {
+    const {auth0Domain, clientId, clientSecret, customScheme, customDomain} = props;
+    const authorizationCodeType = 'authorization_code';
+    const refreshTokenType = 'refresh_token';
+    const redirectUri = `${customScheme}://${customDomain}/home.html`;
+    const tokenUrl = `https://${auth0Domain}/oauth/token`;
 
-  function authWithRefreshToken() {
-    authConfig.grant_type = refreshTokenType;
-    authConfig.refresh_token = refresh_token;
+    const authConfig = {
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+    };
 
-    axios.post(tokenUrl, authConfig).then((response) => {
-      const { access_token, id_token } = response.data;
-      sessionStorage.setItem('access_token', access_token);
-      populateView(id_token, true);
-    }).catch(console.log);
-  }
+    const refresh_token = localStorage.getItem('refresh_token');
+    if (refresh_token) authWithRefreshToken();
+    else authWithAuthorizationToken();
 
-  function authWithAuthorizationToken() {
-    // parsing the hash to get access to `code`
-    const hash = window.location.hash.substring(1);
-    const hashParams = {};
-    hash.split('&').map(hashParam => {
-      const keyValue = hashParam.split('=');
-      hashParams[keyValue[0]] = keyValue[1];
-    });
+    function authWithRefreshToken() {
+      authConfig.grant_type = refreshTokenType;
+      authConfig.refresh_token = refresh_token;
 
-    authConfig.grant_type = authorizationCodeType;
-    authConfig.code = hashParams.code;
+      axios.post(tokenUrl, authConfig).then((response) => {
+        const { access_token, id_token } = response.data;
+        sessionStorage.setItem('access_token', access_token);
+        populateView(id_token, true);
+      }).catch(console.log);
+    }
 
-    axios.post(tokenUrl, authConfig).then((response) => {
-      const { access_token, refresh_token, id_token } = response.data;
+    function authWithAuthorizationToken() {
+      // parsing the hash to get access to `code`
+      const hash = window.location.hash.substring(1);
+      const hashParams = {};
+      hash.split('&').map(hashParam => {
+        const keyValue = hashParam.split('=');
+        hashParams[keyValue[0]] = keyValue[1];
+      });
 
-      sessionStorage.setItem('access_token', access_token);
-      localStorage.setItem('refresh_token', refresh_token);
-      populateView(id_token);
-    }).catch(console.log);
-  }
+      authConfig.grant_type = authorizationCodeType;
+      authConfig.code = hashParams.code;
 
-  function populateView(idToken, loadedWithRefresh) {
-    const profile = jwt_decode(idToken);
+      axios.post(tokenUrl, authConfig).then((response) => {
+        const { access_token, refresh_token, id_token } = response.data;
 
-    document.getElementById('picture').src = profile.picture;
-    document.getElementById('name').innerText = profile.name;
+        sessionStorage.setItem('access_token', access_token);
+        localStorage.setItem('refresh_token', refresh_token);
+        populateView(id_token);
+      }).catch(console.log);
+    }
 
-    const message = loadedWithRefresh ?
-      'The `access_token` was loaded with the refresh code.' :
-      'The `access_token` was loaded with the authorization code.';
+    function populateView(idToken, loadedWithRefresh) {
+      const profile = jwt_decode(idToken);
 
-    document.getElementById('success').innerText = message;
-  }
+      document.getElementById('picture').src = profile.picture;
+      document.getElementById('name').innerText = profile.name;
 
-  function logout() {
-    localStorage.clear();
-    window.location.assign(`${customScheme}://${customDomain}/index.html`);
-  }
+      const message = loadedWithRefresh ?
+        'The `access_token` was loaded with the refresh code.' :
+        'The `access_token` was loaded with the authorization code.';
+
+      document.getElementById('success').innerText = message;
+      document.getElementById('logout').onclick = logout;
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.assign(`${customScheme}://${customDomain}/index.html`);
+    }
+  });
 </script>
 
 </html>

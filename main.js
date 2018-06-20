@@ -1,4 +1,4 @@
-const {app, BrowserWindow, protocol} = require('electron');
+const {app, BrowserWindow, ipcMain, protocol} = require('electron');
 
 let win;
 
@@ -31,9 +31,16 @@ function showWindow() {
   win = new BrowserWindow({
     width: 1000,
     height: 600,
-    webPreferences: {
-      nodeIntegration: false,
-    }
+  });
+
+  ipcMain.on('loaded', () => {
+    win.webContents.send('globalProps', {
+      auth0Domain: 'bk-tmp.auth0.com',
+      clientId: 'SZn5thLoabZeWatzCJZ5i1kpcnwx4IVm',
+      clientSecret: 'A-7Fg2lLFiJALIkpaKZ2MoYw_WEUUtq3_MnNWACr0PRXe8DyyF9ylkDxQm92mnkE',
+      customScheme,
+      customDomain,
+    });
   });
 
   // and load the index.html of the app.
