@@ -2,19 +2,20 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Home Page</title>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://rawgit.com/auth0/jwt-decode/master/build/jwt-decode.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Home Page</title>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://rawgit.com/auth0/jwt-decode/master/build/jwt-decode.min.js"></script>
 </head>
 
 <body>
-    <h2>Welcome Home</h2>
-    <img style="max-width: 80px" id="picture" />
-    <h3 id="name"></h3>
-    <div id="success"></div>
+  <h2>Welcome Home</h2>
+  <img style="max-width: 80px" id="picture" />
+  <h3 id="name"></h3>
+  <div id="success"></div>
+  <button onclick="logout()">Logout</button>
 </body>
 
 <script>
@@ -81,6 +82,11 @@
       'The `access_token` was loaded with the authorization code.';
 
     document.getElementById('success').innerText = message;
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.assign(`${customScheme}://${customDomain}/index.html`);
   }
 </script>
 
