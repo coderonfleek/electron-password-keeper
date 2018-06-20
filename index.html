@@ -29,6 +29,10 @@
   const scope = 'openid profile offline_access read:passwords';
   const state = 'czc13QkjPlb9V-xCmMpqDlURjSyse02L';
 
+  // checking for refresh token to redirect authenticated users
+  const refresh_token = localStorage.getItem('refresh_token');
+  if (refresh_token) window.location.assign(encodeURI(redirectUri));
+
   const authorisationUrl = 'https://' + auth0Domain + '/authorize' +
     '?client_id=' + clientId +
     '&client_secret=' + clientSecret +
