@@ -20,7 +20,22 @@
 
 <body>
 
+    <p>
+        <button onclick="auth0Client.authorize()">Click here to sign in.</button>
+    </p>
+
     <script>
+        const customScheme = 'custom-scheme';
+        const customDomain = 'custom-domain';
+
+        auth0Client = new auth0.WebAuth({
+            domain: 'fikitout.auth0.com',
+            scope: 'openid profile',
+            responseType: 'code',
+            clientID: 'Ml52S0dL3GHJUuL4Q8Vl7aeL540pELiM',
+            redirectUri: `${customScheme}://${customDomain}/home.html`
+        });
+
 
         /* var lock = new Auth0LockPasswordless('nQ7YbPzFmBs3gcaZfjFbrz7vxTPDi2mm', 'fikitout.auth0.com', {
             allowedConnections: ['email'],           // Should match the Email connection name, it defaults to 'email'     
@@ -29,7 +44,7 @@
                 redirect: false
             }
         }); */
-        var lock = new Auth0LockPasswordless(
+        /* var lock = new Auth0LockPasswordless(
             "Ml52S0dL3GHJUuL4Q8Vl7aeL540pELiM",
             "fikitout.auth0.com",
             {
@@ -67,7 +82,7 @@
             console.log('authorization_error', error);
         });
 
-        lock.show();
+        lock.show(); */
 
 
     </script>
